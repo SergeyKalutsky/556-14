@@ -59,5 +59,3 @@
         methods:
             follow_the_object
 
-Константы:
-    FPS

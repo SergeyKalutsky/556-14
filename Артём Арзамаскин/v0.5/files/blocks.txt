@@ -1,0 +1,4 @@
+Dirt  dirt.png
+Grass  grass.png
+Stone  stone.png
+Unbreakable  fill(0, 0, 0)

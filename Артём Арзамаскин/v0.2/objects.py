@@ -1,6 +1,7 @@
 import pygame as pg
 from constants import *
 BSIZE *= 10
+CSIZE *= 10
 
 class Mouse:
     def __init__(self, bad, good, screen, player):
@@ -24,7 +25,7 @@ class Mouse:
         for obj in chank:
             if obj.x == mpos[0] and obj.y == mpos[1]:
                 return
-        block = Block(mpos[0], mpos[1], self.player)
+        block = Stone(mpos[0], mpos[1], self.player)
         chank.add(block)
     
     def del_block(self, chank):
@@ -38,7 +39,7 @@ class Player(pg.sprite.Sprite):
     def __init__(self, x, y, img=None, size=(1, 2)):
         super().__init__()
         self.image = pg.Surface((size[0] * BSIZE, size[1] * BSIZE)) #pg.image.load(img)
-        pg.draw.rect(self.image, (0, 255, 0), (0, 0, size[0]*BSIZE-1, size[1]*BSIZE-1), 2)
+        self.image.fill((50, 200, 100))
         self.rect = self.image.get_rect()
         self.rect.x = WWIDTH // 2 - self.rect.width // 2
         self.rect.y = WHEIGHT // 2 - self.rect.height // 2
@@ -58,7 +59,7 @@ class Player(pg.sprite.Sprite):
             pd = not bool(pg.sprite.spritecollide(self, chank, False))
         self.rect.y += 2
         if pd or self.y <= self.rect.height:
-            self.change_y = 5 * (self.rect.height // BSIZE)
+            self.change_y = 5 * ((self.rect.height) // BSIZE)
 
     def move(self, chank):
         self.grav(chank)
@@ -119,10 +120,9 @@ class Player(pg.sprite.Sprite):
             self.change_y = 0
 
 class Block(pg.sprite.Sprite):
-    def __init__(self, x, y, player, texture=None):
+    def __init__(self, x, y, player, image):
         super().__init__()
-        self.image = pg.Surface((BSIZE, BSIZE))
-        pg.draw.rect(self.image, RED, (0, 0, BSIZE-1, BSIZE-1), 2)
+        self.image = image
         self.rect = self.image.get_rect()
         self.x, self.y = (x, y)
         self.player = player
@@ -132,3 +132,49 @@ class Block(pg.sprite.Sprite):
     def update(self):
         self.rect.x = self.player.x + self.x
         self.rect.y = self.player.y + self.y
+    
+    def copy(self):
+        copy = self.__class__(self.x, self.y, self.player)
+        return copy
+
+class Grass(Block):
+    def __init__(self, x, y, player):
+        image = pg.Surface((BSIZE, BSIZE))
+        pg.draw.rect(image, GREEN, (0, 0, BSIZE, BSIZE), 4)
+        super().__init__(x, y, player, image)
+
+class Dirt(Block):
+    def __init__(self, x, y, player):
+        image = pg.Surface((BSIZE, BSIZE))
+        pg.draw.rect(image, BROWN, (0, 0, BSIZE, BSIZE), 4)
+        super().__init__(x, y, player, image)
+
+class Stone(Block):
+    def __init__(self, x, y, player):
+        image = pg.Surface((BSIZE, BSIZE))
+        pg.draw.rect(image, GRAY, (0, 0, BSIZE, BSIZE), 4)
+        super().__init__(x, y, player, image)
+
+class Chank:
+    def __init__(self, generation):
+        self.map = pg.sprite.Group()
+        self.map.add(*generation)
+    
+    def get_group(self):
+        for obj in self.map:
+            # print(obj.x, obj.y, obj.rect.x, obj.rect.y)
+            break
+        return self.map
+    
+    def change_pos(self, move_x=0, move_y=0):
+        for obj in self.map:
+            obj.x += move_x * BSIZE * CSIZE
+            obj.y += move_y * BSIZE * CSIZE
+    
+    def copy(self):
+        new_map = []
+        for original in self.map:
+            clone = original.copy()
+            new_map.append(clone)
+        new_map = pg.sprite.Group(new_map)
+        return self.__class__(new_map)
