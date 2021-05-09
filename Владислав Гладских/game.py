@@ -1,8 +1,4 @@
-'''
-Модуль 4
-Результат работы на уроке 3
-Проект платформер. Добавлено главное меню.
-'''
+
 import pygame
 import game_object
 from constants import *
@@ -13,7 +9,7 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode([WIN_WIDTH, WIN_HEIGHT])
         pygame.display.set_caption('Test')
-        self.background_img = pygame.image.load("background1.jpg").convert()
+        self.background_img = pygame.image.load("background1.jpg", "background2.jpg").convert()
         self.all_sprite_list = pygame.sprite.Group()
         # Создаем платформы
         self.platform_list = pygame.sprite.Group()
@@ -49,9 +45,7 @@ class Game:
     def create_enemies(self):
         # Создаем противников в игре
         enemies_coords = [
-            [150, 350, 400],
-            [500, 550, 750],
-            [1250, 550, 1400]
+          
         ]
         for coord in enemies_coords:
             enemy = game_object.Enemy(coord[0], coord[1])
@@ -76,13 +70,24 @@ class Game:
     def create_walls(self):
         # Создаем стены и платформы
         platform_coords = [
-            [500, 600, 65, 300],
-            [155, 345, 65, 250],
-            [320, 350, 145, 60],
-            [550, 245, 65, 355],
-            [735, 125, 65, 420],
-            [0, 300, 65, 300],
-            [0, 590, 600, 10],
+            [64, 537, 65, 300],
+            [0, 537, 65, 300],
+            [128, 537, 65, 300],
+            [192, 537, 65, 300],
+            [256, 537, 65, 300],
+            [320, 537, 65, 300],
+            [384, 537, 65, 300],
+            [448, 537, 65, 300],
+            [512, 537, 65, 300],
+            [576, 537, 65, 300],
+            [640, 537, 65, 300],
+            [704, 537, 65, 300],
+            [768, 537, 65, 300],
+
+
+
+
+            
         ]
         for coord in platform_coords:
             platform = game_object.Platform(coord[0], coord[1], coord[2], coord[3])
@@ -90,14 +95,10 @@ class Game:
             self.all_sprite_list.add(platform)
 
     def create_drops(self):
-        # Создаем дропы в игре
+        # Создаем ящики
         drop_coords = [
-            [170, 305],
-            [320, 310],
-            [370, 310],
-            [420, 310],
-            [565, 205],
-            [745, 85]
+            [210, 240],
+          
         ]
         for coord in drop_coords:
             drop = game_object.Drop(coord[0], coord[1])
@@ -185,9 +186,9 @@ class Game:
         done = False
         # Запустили главный игровой цикл:
         while not done:
-            if self.player.rect.right >= 500 and abs(self.shift) < self.game_width - WIN_WIDTH:
-                diff = self.player.rect.right - 500
-                self.player.rect.right = 500
+            if self.player.rect.right >= 600 and abs(self.shift) < self.game_width - WIN_WIDTH:
+                diff = self.player.rect.right - 600
+                self.player.rect.right = 600
                 self.shift_world(-diff)
 
             if self.player.rect.left <= 120 and abs(self.shift) > 0:
@@ -207,10 +208,7 @@ class Game:
                 self.all_sprite_list.update()
                 
                 
-                # Проверяем, не досиг ли персонаж выхода:
-                if self.player.rect.x > WIN_WIDTH - 70 and self.player.rect.y > WIN_HEIGHT - 70:
-                    self.state = 'FINISH'
-
+                
             # Если игра на паузе или на старте, обновляем  меню:
             else:
                 self.main_menu.update()

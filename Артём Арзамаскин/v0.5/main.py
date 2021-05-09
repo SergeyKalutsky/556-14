@@ -13,7 +13,7 @@ class Main:
         self.generate()
         self.mouse = objects.Mouse((255, 0, 0), (0, 0, 255), self.screen, self.player, self.chanks)
         self.items = pg.sprite.Group()
-        self.mobs = pg.sprite.Group(objects.Mob(200, -1000, self.player, (1, 2)))
+        self.mobs = pg.sprite.Group()
     
     def play(self):
         self.set_chank()
@@ -29,7 +29,7 @@ class Main:
         #     break
     
     def generate(self):
-        blocks = [objects.Stone, objects.Dirt, objects.Grass, objects.Unbreakable]
+        blocks = [objects.Stone, objects.Dirt, objects.Grass, objects.Bedrock]
         block_list = []
         for x in range(CSIZE):
             block_list.append([3, x-CSIZE//2, 0])
@@ -48,23 +48,27 @@ class Main:
             block = blocks[coord[0]](*coord[1:], self.player)
             lst.append(block)
         chank = objects.Chank(lst)
-        chank.change_pos(move_x=-10)
+        chank.change_pos(move_x=-25)
         self.chanks.append(chank)
-        for i in range(1, 20):
+        for i in range(1, 60):
             ch = chank.copy()
             ch.change_pos(move_x=i)
             self.chanks.append(ch)
         self.set_chank()
     
     def set_chank(self):
-        index = abs(19-(((self.player.x-WWIDTH//2)//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))%20
-        self.clchank = self.chanks[index]
-        self.chank = self.clchank.get_group()
-        if ((self.player.x-WWIDTH//2)//BSIZE-CSIZE//2)%CSIZE < CSIZE//2:
-            self.clchank2 = self.chanks[index+1]
-        else:
-            self.clchank2 = self.chanks[index-1]
-        self.chank2 = self.clchank2.get_group()
+        try:
+            global SPAWNCHANK
+            index = abs(55-(((self.player.x-WWIDTH//2)//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))
+            self.clchank = self.chanks[index]
+            self.chank = self.clchank.get_group()
+            if ((self.player.x-WWIDTH//2)//BSIZE-CSIZE//2)%CSIZE < CSIZE//2:
+                self.clchank2 = self.chanks[index+1]
+            else:
+                self.clchank2 = self.chanks[index-1]
+            self.chank2 = self.clchank2.get_group()
+        except:
+            pass
     
     def item_collision(self):
         taked = pg.sprite.spritecollide(self.player, self.items, False)
@@ -93,8 +97,14 @@ class Main:
                     if event.button == 1:
                         self.mouse.set_block()
                     elif event.button == 3:
-                        self.mouse.del_block(self.items)
+                        self.mouse.del_block()
             
+            # pr = pg.mouse.get_pressed()
+            # if pr[0]:
+            #     self.mouse.set_block()
+            # elif pr[2]:
+            #     self.mouse.del_block()
+
             pg.display.update()
             self.play()
             self.draw()

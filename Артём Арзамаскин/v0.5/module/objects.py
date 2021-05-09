@@ -17,7 +17,7 @@ class Mouse:
     
     def select(self):
         mpos = list(pg.mouse.get_pos())
-        chank = abs(19-(((self.player.x-mpos[0])//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))%20
+        chank = abs(55-(((self.player.x-WWIDTH//2)//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))
         mpos[0] = (mpos[0]//BSIZE-self.player.x//BSIZE)*BSIZE
         mpos[1] = (mpos[1]//BSIZE-self.player.y//BSIZE)*BSIZE
         return self.chanks[chank].get_group(), mpos
@@ -27,10 +27,10 @@ class Mouse:
         for obj in chank:
             if obj.x == pos[0] and obj.y == pos[1]:
                 return
-        block = Stone(pos[0], pos[1], self.player)
+        block = CobbleStone(pos[0], pos[1], self.player)
         chank.add(block)
     
-    def del_block(self, items):
+    def del_block(self):
         chank, pos = self.select()
         for obj in chank:
             if obj.x == pos[0] and obj.y == pos[1]:
@@ -82,6 +82,8 @@ class Player(pg.sprite.Sprite):
         if bool(bhl):
             self.rect.x = x
             if not bool(pg.sprite.spritecollide(self, chank, False)):
+                for obj in bhl:
+                    obj.collision()
                 obj = bhl[0]
                 if self.change_x > 0:
                     self.rect.right = obj.rect.left
@@ -94,6 +96,8 @@ class Player(pg.sprite.Sprite):
         if bool(bhl):
             self.rect.y = y
             if not bool(pg.sprite.spritecollide(self, chank, False)):
+                for obj in bhl:
+                    obj.collision()
                 obj = bhl[0]
                 if self.change_y > 0:
                     self.rect.top = obj.rect.bottom
@@ -118,7 +122,7 @@ class Player(pg.sprite.Sprite):
             self.change_y = -1
         else:
             self.change_y -= .25
-        self.change_y = min(BSIZE, self.change_y)
+        self.change_y = max(-BSIZE, self.change_y)
         
         if self.y - self.rect.height <= 0:
             self.y = self.rect.height
@@ -142,29 +146,34 @@ class Block(pg.sprite.Sprite):
     def copy(self):
         copy = self.__class__(self.x, self.y, self.player)
         return copy
+    
+    def collision(self):
+        pass
 
 class Grass(Block):
     def __init__(self, x, y, player):
-        image = pg.Surface((BSIZE, BSIZE))
-        pg.draw.rect(image, GREEN, (0, 0, BSIZE, BSIZE), 4)
+        image = files.blocks['Grass']
         super().__init__(x, y, player, image)
 
 class Dirt(Block):
     def __init__(self, x, y, player):
         image = files.blocks['Dirt']
-        pg.draw.rect(image, BROWN, (0, 0, BSIZE, BSIZE), 4)
         super().__init__(x, y, player, image)
 
 class Stone(Block):
     def __init__(self, x, y, player):
-        image = pg.Surface((BSIZE, BSIZE))
-        pg.draw.rect(image, GRAY, (0, 0, BSIZE, BSIZE), 4)
+        image = files.blocks['Stone']
         super().__init__(x, y, player, image)
 
-class Unbreakable(Block):
+class Bedrock(Block):
     def __init__(self, x, y, player):
-        image = pg.Surface((BSIZE, BSIZE))
+        image = files.blocks['Bedrock']
         super().__init__(x, y, player, image, False)
+
+class CobbleStone(Block):
+    def __init__(self, x, y, player):
+        image = files.blocks['CobbleStone']
+        super().__init__(x, y, player, image)
 
 class Chank:
     def __init__(self, generation):
@@ -232,17 +241,14 @@ class Mob(pg.sprite.Sprite):
     
     def update(self, chank1, chank2, chanks):
         self.rect.x = self.player.x + self.x + self.change_x
-        self.rect.y = self.player.y + self.y - self.player.change_y
-        index = abs(19-(((-self.x)//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))%20
+        self.rect.y = self.player.y + self.y - abs(self.player.change_y)
+        index = abs(55-(((-self.x)//BSIZE-CSIZE//2)//CSIZE+SPAWNCHANK))
         if chanks[index] == chank1 or chanks[index] == chank2: chank = chanks[index].get_group()
         else: return
         self.move(chank)
     
     def move(self, chank):
-        self.grav(chank)
-
-        self.change_x = 4
-        
+        self.grav(chank)        
         self.collision(chank)
         self.change_x = 0
     
@@ -300,7 +306,3 @@ class Mob(pg.sprite.Sprite):
             self.change_y = -1
         else:
             self.change_y -= .25
-        
-        # if self.y - self.rect.height >= 0:
-        #     self.y = self.rect.height
-        #     self.change_y = 0

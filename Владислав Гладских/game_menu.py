@@ -122,7 +122,7 @@ class TimerLabel:
         self.minutes = 0
         self.sec = 0
         self.font = pygame.font.SysFont('Arial', 24, True)
-        self.text = FONT.render('%02d:%02d' % (self.minutes, self.sec), True, YELLOW)
+        self.text = FONT.render('%02d:%02d' % (self.minutes, self.sec), True, BLACK)
         self.rect = self.text.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -140,20 +140,14 @@ class TimerLabel:
     def draw(self, screen):
         screen.blit(self.text, self.rect)
 
-''' 
-Класс TopPanel отвечает за отрисовку верхней панели в игре
-На верхней панели должно отображаться: 
-- количеств собранных в игре монет (картинка монеты + число)
-- количество жизней игрока (картинка сердечка + число)
-- таймер отсчета времени
-'''
+
 class TopPanel():
     def __init__(self, x=5, y=5):
         self.x = x
         self.y = y
         self.width = WIN_WIDTH - 2 * x
         # Создаем надпись для количества жизней игрока:
-        self.lives_label = FONT.render('3' , True, YELLOW)
+        self.lives_label = FONT.render('3' , True, BLACK)
         self.lives_rect = self.lives_label.get_rect()
         self.lives_rect.x = x + 35
         self.lives_rect.y = y
@@ -163,27 +157,14 @@ class TopPanel():
         self.lives_img_rect.y = y
         self.lives_img_rect.x = x
 
-        # Создаем надпись для количество собранных монет:
-        self.coin_label = FONT.render('0' , True, YELLOW)
-        self.coin_rect = self.coin_label.get_rect()
-        self.coin_rect.x = x + 135
-        self.coin_rect.y = y
-        # Создаем пиктограмму монеты:
-        self.coin_img = pygame.image.load('drop.png').convert_alpha()
-        self.coin_img_rect = self.coin_img.get_rect()
-        self.coin_img_rect.y = y
-        self.coin_img_rect.x = x + 100
         # Создаем таймер на панели
-        self.timer = TimerLabel(x + 200, y)
+        self.timer = TimerLabel(x + 70, y)
 
-    def update(self, lives=3, coin=0):
-        self.lives_label = FONT.render(str(lives) , True, YELLOW)
-        self.coin_label = FONT.render(str(coin) , True, YELLOW)
+    def update(self, lives=3):
+        self.lives_label = FONT.render(str(lives) , True, BLACK)
         self.timer.update()
 
     def draw(self, screen):
         screen.blit(self.lives_label, self.lives_rect)
         screen.blit(self.lives_img, self.lives_img_rect)
-        screen.blit(self.coin_label, self.coin_rect)
-        screen.blit(self.coin_img, self.coin_img_rect)
         self.timer.draw(screen)

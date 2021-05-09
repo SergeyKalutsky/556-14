@@ -36,6 +36,7 @@
             automatic_shooting
             angle
         methods:
+            __init__()
             shoot()
 
     Bullet:
@@ -45,6 +46,7 @@
             sprite
             move_direction
         methods:
+            __init__()
             move()
     
     Tile:
@@ -54,11 +56,14 @@
             sprite
             bg_or_fg
             fake
+        methods:
+            __init__()
     
     Camera:
         attributes:
             x
             y
         methods:
-            follow_the_object
+            __init__()
+            follow_the_object()
 ```
