@@ -8,7 +8,7 @@ class Player(pygame.sprite.Sprite):
     """
     # Конструктор класса
 
-    def __init__(self, x, y, img='steve.png'):
+    def __init__(self, x, y, img='images/steve.png'):
         super().__init__()
         # Задаем размеры прямоугольника
         self.image = pygame.image.load(img).convert_alpha()
@@ -115,7 +115,7 @@ class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         # Создаем прямоугольник заданных параметров
-        img = random.choice(self.images)
+        img = 'images/'+random.choice(self.images)
         self.image = pygame.image.load(img).convert_alpha()
         self.rect = self.image.get_rect()
         # Помещаем прямоугольник в заданне место на экране
@@ -124,7 +124,7 @@ class Platform(pygame.sprite.Sprite):
 
 
 class Artifact(pygame.sprite.Sprite):
-    def __init__(self, x, y, img='coin.png'):
+    def __init__(self, x, y, img='images/coin.png'):
         super().__init__()
         super().__init__()
         # Задаем размеры прямоугольника
@@ -137,7 +137,7 @@ class Artifact(pygame.sprite.Sprite):
 
 # Класс Enemy описывает противника персонажа - по умолчанию это крокодил
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, img="skeleton.png"):
+    def __init__(self, x, y, img="images/skeleton.png"):
         super().__init__()
         # Загружаем изображение в спрайт
         self.image = pygame.image.load(img).convert_alpha()

@@ -158,7 +158,7 @@ class TopPanel():
         self.lives_rect.x = x + 35
         self.lives_rect.y = y
         # Создаем пиктограмму сердечка:
-        self.lives_img = pygame.image.load('heart.png').convert_alpha()
+        self.lives_img = pygame.image.load('images/heart.png').convert_alpha()
         self.lives_img_rect = self.lives_img.get_rect()
         self.lives_img_rect.y = y
         self.lives_img_rect.x = x
@@ -169,7 +169,7 @@ class TopPanel():
         self.coin_rect.x = x + 135
         self.coin_rect.y = y
         # Создаем пиктограмму монеты:
-        self.coin_img = pygame.image.load('coin.png').convert_alpha()
+        self.coin_img = pygame.image.load('images/coin.png').convert_alpha()
         self.coin_img_rect = self.coin_img.get_rect()
         self.coin_img_rect.y = y
         self.coin_img_rect.x = x + 100

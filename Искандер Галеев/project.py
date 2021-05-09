@@ -1,4 +1,3 @@
-
 import pygame
 import game_object
 from constants import *
@@ -9,7 +8,7 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode([WIN_WIDTH, WIN_HEIGHT])
         pygame.display.set_caption('Test')
-        self.background_img = pygame.image.load("background.jpg").convert()
+        self.background_img = pygame.image.load("images/background.jpg").convert()
         self.all_sprite_list = pygame.sprite.Group()
         # Создаем платформы
         self.platform_list = pygame.sprite.Group()
