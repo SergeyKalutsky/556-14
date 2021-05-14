@@ -27,8 +27,9 @@ class Player(pygame.sprite.Sprite):
         if not self.jumping and self.rect.y < 500:
             self.rect.y += 15
             #self.rect.x += 10
+        
 
-
+        
     def speed(self):
         keys = pygame.key.get_pressed()
         print(keys)
@@ -68,3 +69,33 @@ class Player(pygame.sprite.Sprite):
 
     def move(self):
         self.rect.x += self.move_speed * 1/60 + (2*1/3600)/2
+        
+class Gun():
+        
+    def __init__(self, damage, x, y):
+        self.damage = damage
+        self.shoot = False
+        self.x = x
+        self.y = y
+        self.rad = 10
+        self.bul = 0
+        self.bul_x = 0
+    def bullet_pos(self, player):
+        bullet_out = player.rect.x
+        return bullet_out 
+        
+            
+    def update(self, engine, screen, player):
+        self.x = player.rect.x
+        
+        
+        
+        if self.shoot:
+            self.bul_x += self.x
+            engine.draw.circle(screen, (51,51,51), (self.bul_x, self.y), self.rad)
+            self.bul_x += 10
+        
+        if self.bul_x >= 1700:
+            self.shoot = False
+            
+                

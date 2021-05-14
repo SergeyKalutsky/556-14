@@ -107,16 +107,16 @@ class Game:
                 active_button.state =  'normal'
 
                 # Нажали на кнопку START, начинаем игру заново:
-                if active_button.name == 'START':
+                if active_button.name == 'START MiNeCrAfT':
                     self.__init__()
                     self.state = 'GAME'
 
                 # На паузе и нажали CONTINUE, переведем игру с состояние GAME:
-                elif active_button.name == 'CONTINUE':
+                elif active_button.name == 'CONTINUE MiNeCrAfT':
                     self.state = 'GAME'
 
                 # Нажали на QUIT - завешим работу приложения:
-                elif active_button.name == 'QUIT':
+                elif active_button.name == 'QUIT MiNeCrAfT':
                     pygame.quit()
 
 

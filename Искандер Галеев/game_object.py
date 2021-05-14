@@ -28,10 +28,8 @@ class Player(pygame.sprite.Sprite):
         # учитываем эффект гравитации:
         self.calc_grav()
         # Пересчитываем положение спрайта игрока на экране
-
         # Смещение влево - вправо
         self.rect.x += self.change_x
-
         # Проверяем столкновение с препятствием
         block_hit_list = pygame.sprite.spritecollide(
             self, self.platforms, False)

@@ -8,7 +8,7 @@ class Main:
         pg.display.set_caption(WNAME)
         files.init()
         self.clock = pg.time.Clock()
-        self.player = objects.Player(0, 1000, None, (1, 2))
+        self.player = objects.Player(0, 1000, self.screen, None, (1, 2))
         self.chanks = []
         self.generate()
         self.mouse = objects.Mouse((255, 0, 0), (0, 0, 255), self.screen, self.player, self.chanks)
@@ -71,7 +71,7 @@ class Main:
             pass
     
     def item_collision(self):
-        taked = pg.sprite.spritecollide(self.player, self.items, False)
+        taked = pg.sprite.groupcollide(self.player.sprites, self.items, False, False)
         for item in taked:
             if item.take:
                 item.collision()
@@ -83,9 +83,10 @@ class Main:
         self.chank2.draw(self.screen)
         self.items.draw(self.screen)
         self.mobs.draw(self.screen)
-        self.screen.blit(self.player.image, self.player.rect)
+        self.player.draw(self.screen)
         self.mouse.block()
         pg.display.update()
+        # pg.time.delay(3000)
 
     def run(self):
         run = True
@@ -105,9 +106,9 @@ class Main:
             # elif pr[2]:
             #     self.mouse.del_block()
 
-            pg.display.update()
-            self.play()
             self.draw()
+            self.play()
+            pg.display.flip()
             self.clock.tick(FPS)
         pg.quit()
 

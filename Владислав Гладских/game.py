@@ -4,30 +4,30 @@ import game_object
 from constants import *
 from game_menu import *
 
+
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode([WIN_WIDTH, WIN_HEIGHT])
         pygame.display.set_caption('Test')
-        self.background_img = pygame.image.load("background1.jpg", "background2.jpg").convert()
+        self.background_img = pygame.image.load("images/phon.png").convert()
         self.all_sprite_list = pygame.sprite.Group()
         # Создаем платформы
         self.platform_list = pygame.sprite.Group()
         self.create_walls()
-        # Создаем артефакты
+        # Создаем ящики
         self.drop_list = pygame.sprite.Group()
-        self.create_drops()       
+        self.create_drops()
         self.enemy_list = pygame.sprite.Group()
         self.create_enemies()
 
         # Создаем спрайт игрока
-        self.player = game_object.Player(0, 0)
+        self.player = game_object.Player(60, 450)
         self.player.platforms = self.platform_list
-        self.player.dropss = self.drop_list
+        self.player.drops = self.drop_list
         self.all_sprite_list.add(self.player)
 
-
-          # Программируем смещение игрового мира:
+        # Программируем смещение игрового мира:
         self.shift = 0
         self.player_global_x = self.player.rect.x
         self.game_width = self.background_img.get_rect().width
@@ -38,14 +38,16 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
-
         # states: 'START', 'GAME', 'PAUSE', 'FINISH', 'GAME_OVER'
         self.state = 'START'
 
+    
+    
+    
     def create_enemies(self):
         # Создаем противников в игре
         enemies_coords = [
-          
+
         ]
         for coord in enemies_coords:
             enemy = game_object.Enemy(coord[0], coord[1])
@@ -61,11 +63,6 @@ class Game:
 
         for drop in self.drop_list:
             drop.rect.x += shift_x
-
-
-
-
-
 
     def create_walls(self):
         # Создаем стены и платформы
@@ -84,28 +81,22 @@ class Game:
             [704, 537, 65, 300],
             [768, 537, 65, 300],
 
-
-
-
-            
         ]
         for coord in platform_coords:
-            platform = game_object.Platform(coord[0], coord[1], coord[2], coord[3])
+            platform = game_object.Platform(
+                coord[0], coord[1], coord[2], coord[3])
             self.platform_list.add(platform)
             self.all_sprite_list.add(platform)
 
     def create_drops(self):
         # Создаем ящики
         drop_coords = [
-            [210, 240],
-          
+            [410, 500],
         ]
         for coord in drop_coords:
             drop = game_object.Drop(coord[0], coord[1])
             self.drop_list.add(drop)
             self.all_sprite_list.add(drop)
-
-
 
     def handle_scene(self, event):
         if self.state == 'GAME':
@@ -132,7 +123,7 @@ class Game:
             active_button = self.main_menu.handle_mouse_event(event.type)
             if active_button:
                 # После того, как на кнопку нажали, возвращаем ее состояние в "normal":
-                active_button.state =  'normal'
+                active_button.state = 'normal'
 
                 # Нажали на кнопку START, начинаем игру заново:
                 if active_button.name == 'START':
@@ -146,7 +137,6 @@ class Game:
                 # Нажали на QUIT - завешим работу приложения:
                 elif active_button.name == 'QUIT':
                     pygame.quit()
-
 
     def draw_scene(self):
         # Выполняем заливку фона:
@@ -171,20 +161,8 @@ class Game:
             # Рисуем только главное меню:
             self.main_menu.draw(self.screen)
 
-    class Game:
-        def __init__(self):
-            # Создаем противников
-            self.enemy_list = pygame.sprite.Group()
-            self.create_enemies()
-        # Будем вести отсчет игрового времени:
-
-            self.time = 0
-
-
-
     def run(self):
         done = False
-        # Запустили главный игровой цикл:
         while not done:
             if self.player.rect.right >= 600 and abs(self.shift) < self.game_width - WIN_WIDTH:
                 diff = self.player.rect.right - 600
@@ -195,28 +173,23 @@ class Game:
                 diff = 120 - self.player.rect.left
                 self.player.rect.left = 120
                 self.shift_world(diff)
-
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     done = True
-
-                # Обрабатываем события для разных состояний:
                 self.handle_scene(event)
 
-            # Если идет игра, обновляем все объекты в игре:
             if self.state == 'GAME':
                 self.all_sprite_list.update()
-                
-                
-                
-            # Если игра на паузе или на старте, обновляем  меню:
+
             else:
                 self.main_menu.update()
-            # Отрисовываем окно игры для текущего состояния:
+
             self.draw_scene()
             pygame.display.flip()
             self.clock.tick(60)
         pygame.quit()
+
 
 game = Game()
 game.run()

@@ -4,7 +4,7 @@ from random import choice
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, img='character_without_drop.png'):
+    def __init__(self, x, y, img='images/character_without_drop.png'):
         super().__init__()
         self.image = pygame.image.load(img).convert_alpha()
         # Задаем положение спрайта игрока на экране
@@ -18,6 +18,11 @@ class Player(pygame.sprite.Sprite):
         self.drops = pygame.sprite.Group()
         self.jumps = 0
 
+    
+    
+    
+    def update(self):
+        self.rect.x += self.change_x
         # Проверяем столкновение с препятствием
         block_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
         for block in block_hit_list:
@@ -27,10 +32,7 @@ class Player(pygame.sprite.Sprite):
             elif self.change_x < 0:
                 # Наоборот, если движение было влево остановим его справа от препятствия
                 self.rect.left = block.rect.right
-        
-        
-        
-        # Движение вверх-вниз
+
         self.rect.y += self.change_y
 
         # Проверяем столкновение с препятствием
@@ -46,20 +48,23 @@ class Player(pygame.sprite.Sprite):
             self.change_y = 0
 
         # Проверяем столкновение с ящиком
-        
-    # Расчет гравитации
-    #def calc_grav(self):
-        #if self.change_y == 0:
-            #self.change_y = 1
-        #else:
+        drop_hit_list = pygame.sprite.spritecollide(self, self.drops, False)
+        for drop in drop_hit_list:
+            drop.kill()
+    
+    def calc_grav(self):
+        if self.change_y == 0:
+            self.change_y = 1
+        else:
             # Моделируем ускорение свободного падения:
-            #self.change_y += .35
+            self.change_y += .35
 
         # Проверка: персонаж на земле или нет
         if self.rect.y >= WIN_HEIGHT - self.rect.height and self.change_y >= 0:
             self.change_y = 0
             self.rect.y = WIN_HEIGHT - self.rect.height
 
+    
     def jump(self):
         self.rect.y += 2
         platform_hit_list = pygame.sprite.spritecollide(self, self.platforms, False)
@@ -69,10 +74,10 @@ class Player(pygame.sprite.Sprite):
             self.change_y = -10
 
     def go_left(self):
-        self.change_x = -6
+        self.change_x = -5
 
     def go_right(self):
-        self.change_x = 6
+        self.change_x = 5
 
     def stop(self):
         self.change_x = 0
@@ -80,7 +85,7 @@ class Player(pygame.sprite.Sprite):
 
 class Platform(pygame.sprite.Sprite):
 # Препятствия, по которым моежт перемещаться персонаж, но не сквозь них
-    images = ['ground01.png']
+    images = ['images/ground01.png']
     def __init__(self, x, y, width, height):
         super().__init__()
         # Создаем прямоугольник заданных параметров
@@ -91,11 +96,10 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = y
         self.rect.x = x
 
+
 class Drop(pygame.sprite.Sprite):
-    def __init__(self, x, y, img='drop.png'):
+    def __init__(self, x, y, img='images/drop.png'):
         super().__init__()
-        super().__init__()
-        # Задаем размеры прямоугольника
         self.image = pygame.image.load(img).convert_alpha()
         # Задаем положение спрайта игрока на экране
         self.rect = self.image.get_rect()
@@ -104,7 +108,7 @@ class Drop(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-   def __init__(self, x, y, img="crocodile.png"):
+   def __init__(self, x, y, img="images/crocodile.png"):
        super().__init__()
        # Загружаем изображение в спрайт
        self.image = pygame.image.load(img).convert_alpha()

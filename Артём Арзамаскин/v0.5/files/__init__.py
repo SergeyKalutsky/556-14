@@ -1,8 +1,14 @@
 import pygame as pg
 from module.settings import *
 
+def pull_out(message):
+    message = message.strip('(').strip(')')
+    message = message.split(', ')
+    message = tuple(map(lambda i: int(i)-1, message))
+    return message
+
 def init():
-    global blocks
+    global blocks, player
     fblocks = open('files/blocks.txt')
     fplayer = open('files/player.txt')
     texture = lambda x: 'files/textures/' + x
@@ -23,18 +29,22 @@ def init():
             i = i.strip(':')
             name = i
             player[name] = {}
-        elif '=' in i and i.startswith('    '):
+        elif '=' in i:
+            original = i
             i = i.strip()
-            i = i.split(' = ')
+            i = i.split('=')
+            i[0], i[1] = (i[0].strip(), i[1].strip())
             if i[0] == 'image':
-                image = pg.image.load(texture(i[1]))
-            else:
-                i1 = i[1].strip('(').strip(')')
-                i1 = i1.split(', ')
-                i1 = tuple(map(lambda i: int(i), i1))
-                player[name][i[0]] = image.subsurface(i1)
-
-    print(player)
+                image = pg.image.load(texture(i[1])).convert_alpha()
+            elif original.startswith('    '):
+                del original
+                i[0] = int(i[0])
+                img = pull_out(i[1])
+                img = image.subsurface(img)
+                size = img.get_rect()
+                size = (size.width, size.height)
+                img = pg.transform.scale(img, (size[0]*4, size[1]*4))
+                player[name][i[0]] = img
 
     fplayer.close()
     fblocks.close()

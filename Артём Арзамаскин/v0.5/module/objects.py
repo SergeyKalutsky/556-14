@@ -38,30 +38,99 @@ class Mouse:
                     chank.remove(obj)
                 return
 
-class Player(pg.sprite.Sprite):
-    def __init__(self, x, y, img=None, size=(1, 2)):
+class Image(pg.sprite.Sprite):
+    def __init__(self, image, pos):
         super().__init__()
-        self.image = pg.Surface((size[0] * BSIZE, size[1] * BSIZE)) #pg.image.load(img)
-        self.image.fill((50, 200, 100))
+        self.image = image
         self.rect = self.image.get_rect()
-        self.rect.x = WWIDTH // 2 - self.rect.width // 2
-        self.rect.y = WHEIGHT // 2 - self.rect.height // 2
+        self.rect.x, self.rect.y = pos
+    
+    def move_to(self, pos):
+        self.rect.x, self.rect.y = pos
+    
+    def move(self, pos):
+        self.rect.x += pos[0]
+        self.rect.y += pos[1]
+    
+    def update(self, pos):
+        self.move_to(pos)
+
+class Player(pg.sprite.Sprite):
+    def __init__(self, x, y, screen, img=None, size=(1, 2)):
+        super().__init__()
+        self.images_convert()
+        self.resprite(0)
+        self.screen = screen
+        self.sprites_move_to((WWIDTH//2-self.body.rect.width//2-self.lhand.rect.width,
+        WHEIGHT//2-self.body.rect.height//2-self.head.rect.height))
         self.x, self.y = (x, y)
         self.change_y = self.change_x = 0
+        self.ox, self.oy = (self.lhand.rect.x, self.head.rect.y)
+    
+    def rect(self, x, y, color=BLUE):
+        pg.draw.rect(self.screen, color, (x, y, 5, 5))
+        # pg.display.update()
+        # pg.time.delay(1000)
+        return x, y
+        # self.screen.blit(image, (x, y))
+    
+    def sprites_move_to(self, pos):
+        # self.rect(0, 0, self.head.image)
+        # self.rect(50, 0, self.lhand.image)
+        # self.rect(100, 0, self.body.image)
+        # self.rect(150, 0, self.rhand.image)
+        # self.rect(0, 150, self.lleg.image)
+        # self.rect(100, 150, self.rleg.image)
+        self.head.move_to(self.rect(pos[0] + self.lhand.rect.width, pos[1]))
+        self.lhand.move_to(self.rect(pos[0], pos[1] + self.head.rect.height))
+        self.body.move_to(self.rect(pos[0] + self.lhand.rect.width, pos[1] + self.head.rect.height))
+        self.rhand.move_to(self.rect(pos[0] + self.rhand.rect.width + self.body.rect.width, pos[1] + self.head.rect.height))
+        self.lleg.move_to(self.rect(pos[0] + self.lhand.rect.width, pos[1] + self.head.rect.height + self.body.rect.height))
+        self.rleg.move_to(self.rect(pos[0] + self.lhand.rect.width + self.lleg.rect.width, pos[1] + self.body.rect.height + self.head.rect.height))
+        
+    def sprites_move(self, pos):
+        # print('move:', pos)
+        self.body.move(pos)
+        self.head.move(pos)
+        self.lleg.move(pos)
+        self.rleg.move(pos)
+        self.lhand.move(pos)
+        self.rhand.move(pos)
+    
+    def resprite(self, num):
+        self.sprites = pg.sprite.Group()
+        self.body = self.images['body'][num]
+        self.head = self.images['head'][num]
+        self.rleg = self.images['leg'][num]
+        self.lleg = self.images['leg'][num]
+        self.rhand = self.images['hand'][num]
+        self.lhand = self.images['hand'][num]
+        self.sprites.add(self.head, self.rleg, self.lleg, self.rhand, self.lhand, self.body)
+        # self.sprites.add(self.head)
+    
+    def images_convert(self):
+        self.images = files.player
+        for i in self.images.values():
+            for j in i:
+                i[j] = Image(i[j], (0, 0))
     
     def update(self, chank):
         self.move(chank)
         self.collision(chank)
         self.change_x = 0
+        self.sprites_move_to((self.ox, self.oy))
+    
+    def draw(self, screen):
+        self.sprites.draw(screen)
     
     def jump(self, chank):
-        self.rect.y += 2
-        pd = bool(pg.sprite.spritecollide(self, chank, False))
-        self.rect.y -= 4
+        self.sprites_move((0, 2))
+        pd = bool(pg.sprite.groupcollide(self.sprites, chank, False, False))
+        self.sprites_move((0, -4))
         if pd:
-            pd = not bool(pg.sprite.spritecollide(self, chank, False))
-        self.rect.y += 2
-        if pd or self.y <= self.rect.height:
+            pd = not bool(pg.sprite.groupcollide(self.sprites, chank, False, False))
+        self.sprites_move((0, 2))
+        if pd or self.y <= self.lleg.rect.height:
             self.change_y = 5 * ((self.rect.height) // BSIZE)
 
     def move(self, chank):
@@ -76,42 +145,7 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_DOWN] or keys[pg.K_s]: pass
     
     def collision(self, chank):
-        x, y = (self.rect.x, self.rect.y)
-        self.rect.x += self.change_x
-        bhl = pg.sprite.spritecollide(self, chank, False)
-        if bool(bhl):
-            self.rect.x = x
-            if not bool(pg.sprite.spritecollide(self, chank, False)):
-                for obj in bhl:
-                    obj.collision()
-                obj = bhl[0]
-                if self.change_x > 0:
-                    self.rect.right = obj.rect.left
-                else:
-                    self.rect.left = obj.rect.right
-            else:
-                self.change_x = 0
-        self.rect.y -= self.change_y
-        bhl = pg.sprite.spritecollide(self, chank, False)
-        if bool(bhl):
-            self.rect.y = y
-            if not bool(pg.sprite.spritecollide(self, chank, False)):
-                for obj in bhl:
-                    obj.collision()
-                obj = bhl[0]
-                if self.change_y > 0:
-                    self.rect.top = obj.rect.bottom
-                    self.change_y *= -0.25
-                else:
-                    self.rect.bottom = obj.rect.top
-                    self.change_y = 0
-            else:
-                self.change_y = 0
-        cx = self.rect.x - x
-        cy = self.rect.y - y
-        self.cmove(cx, cy)
-        self.rect.x = x
-        self.rect.y = y
+        pass
     
     def cmove(self, x, y):
         self.x -= x
@@ -124,8 +158,8 @@ class Player(pg.sprite.Sprite):
             self.change_y -= .25
         self.change_y = max(-BSIZE, self.change_y)
         
-        if self.y - self.rect.height <= 0:
-            self.y = self.rect.height
+        if self.y - self.lleg.rect.height <= 0:
+            self.y = self.lleg.rect.height
             self.change_y = 0
 
 class Block(pg.sprite.Sprite):

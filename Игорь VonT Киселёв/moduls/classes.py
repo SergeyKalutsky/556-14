@@ -20,10 +20,11 @@ class Ground(obj):
 class Player(obj):
     def __init__(self, image, weapon, max_healt_points, max_stamina, max_speed, position, size=1):
         super().__init__(position)
-        self.size = size
-        self.sprite_sheet = SpriteSheet(image)
-        self.image = pygame.image.load(image).convert_alpha()
+        self.sprite_sheet = SpriteSheet(image, size=size)
+        self.image = self.sprite_sheet.get_image(0, 0, 10*size, 10*size)
+        self.image_size = self.image.get_size()
         self.rect = self.image.get_rect()
+        self.size = size
         
 
         self.max_healt_points = max_healt_points
@@ -60,13 +61,30 @@ class Player(obj):
 
     def update_direction(self, camera_position):
         cursor = pygame.mouse.get_pos()
-        print(camera_position)
         if camera_position[0] > cursor[0]:
-            self.image = self.sprite_sheet.get_image(10, 0, 10, 10)
-            self.image = pygame.transform.scale(self.image, (self.size*self.image.get_width(),self.size*self.image.get_height()))
+            if camera_position[1]+self.image.get_height() < cursor[1]:
+                self.image = self.sprite_sheet.get_image(70*self.size, 0, 10*self.size, 10*self.size)
+            elif camera_position[1] > cursor[1]:
+                self.image = self.sprite_sheet.get_image(50*self.size, 0, 10*self.size, 10*self.size)
+            else:
+                self.image = self.sprite_sheet.get_image(10*self.size, 0, 10*self.size, 10*self.size)
+
+        elif camera_position[0]+self.image.get_width() < cursor[0]:
+            if camera_position[1]+self.image.get_height() < cursor[1]:
+                self.image = self.sprite_sheet.get_image(80*self.size, 0, 10*self.size, 10*self.size)
+            elif camera_position[1] > cursor[1]:
+                self.image = self.sprite_sheet.get_image(60*self.size, 0, 10*self.size, 10*self.size)
+            else:
+                self.image = self.sprite_sheet.get_image(20*self.size, 0, 10*self.size, 10*self.size)
+
         else:
-            self.image = self.sprite_sheet.get_image(20, 0, 10, 10)
-            self.image = pygame.transform.scale(self.image, (self.size*self.image.get_width(),self.size*self.image.get_height()))
+            if camera_position[1]+self.image.get_height() < cursor[1]:
+                self.image = self.sprite_sheet.get_image(40*self.size, 0, 10*self.size, 10*self.size)
+            elif camera_position[1] > cursor[1]:
+                self.image = self.sprite_sheet.get_image(30*self.size, 0, 10*self.size, 10*self.size)
+            else:
+                self.image = self.sprite_sheet.get_image(0, 0, 10*self.size, 10*self.size)
+
 
     def pick_item():
         pass
@@ -87,11 +105,11 @@ class Weapon(obj):
         self.image = pygame.transform.scale(self.image, (self.rect.width*size, self.rect.height*size))
         self.rect = self.image.get_rect()
 
-    def update(self, player):
-        if in_hand:
+    def hand(self, player):
+        if self.in_hand:
             self.position = player.position
-
-
+    def rotate(self, angle):
+        self.image = pygame.transform.rotate(self.image, angle)
 
 
 
@@ -132,9 +150,9 @@ class Vector2D():
 
 
 class SpriteSheet(object):
-    def __init__(self, file_name):
+    def __init__(self, file_name, size=1):
         self.sprite_sheet = pygame.image.load(file_name).convert_alpha()
-
+        self.sprite_sheet = pygame.transform.scale(self.sprite_sheet, (self.sprite_sheet.get_width()*size, self.sprite_sheet.get_height()*size))
 
 
     def get_image(self, x, y, width, height):

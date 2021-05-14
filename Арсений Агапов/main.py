@@ -3,6 +3,7 @@ from playerClass import *
 import main_menu as menu
 import NPC as nc
 
+
 room_list = ['game1.png', 'game2.png']
 
 def init(name):
@@ -40,6 +41,7 @@ player = Player(50, 500, 0, img)
 player_list = pygame.sprite.Group()
 player_list.add(player)
 npc_list = pygame.sprite.Group()
+desert_eagle = Gun(5, player.rect.x, player.rect.y)
 
 image = pygame.image.load('game1.png').convert_alpha()
 image = pygame.transform.scale(image, (1920, 1000))
@@ -55,7 +57,12 @@ while True:
             pygame.quit()
         if event.type == pygame.MOUSEBUTTONDOWN:
             main_menu1.active_a()
+        if event.type == pygame.KEYDOWN:
+            
+            if event.key == pygame.K_p:
+                desert_eagle.shoot = True
 
+    
     mouse_pos = pygame.mouse.get_pos()
     
     if main_menu1.game_on:
@@ -65,6 +72,8 @@ while True:
         player_list.draw(screen)
         player_list.update()
         npc_spawn(rooms, screen)
+        if desert_eagle.shoot:
+            desert_eagle.update(pygame, screen, player)
     else:
         screen.fill(GREY)
         main_menu1.update(screen, 'Start', mouse_pos)

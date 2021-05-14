@@ -39,7 +39,7 @@ class Button():
         screen.blit(self.text, (self.rect.x + self.padding, self.rect.y + self.padding))
 
 
-    # В методе update меняем цвет кнокпи в зависимости от состояния
+    # В методе update меняем цвет кнопки в зависимости от состояния
     def update(self):
         if self.state == 'normal':
             self.image.fill(self.normal_color)
@@ -152,7 +152,7 @@ class TopPanel():
         self.lives_rect.x = x + 35
         self.lives_rect.y = y
         # Создаем пиктограмму сердечка:
-        self.lives_img = pygame.image.load('heart.png').convert_alpha()
+        self.lives_img = pygame.image.load('images/heart.png').convert_alpha()
         self.lives_img_rect = self.lives_img.get_rect()
         self.lives_img_rect.y = y
         self.lives_img_rect.x = x
