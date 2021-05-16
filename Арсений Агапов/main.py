@@ -59,8 +59,14 @@ while True:
             main_menu1.active_a()
         if event.type == pygame.KEYDOWN:
             
-            if event.key == pygame.K_p:
+            if event.key == pygame.K_p and not desert_eagle.shoot:
+                desert_eagle.bullet_x = player.rect.x
                 desert_eagle.shoot = True
+    
+    keys = pygame.key.get_pressed()    
+    if keys[pygame.K_y]:
+        jack.act = True
+        
 
     
     mouse_pos = pygame.mouse.get_pos()
@@ -72,8 +78,9 @@ while True:
         player_list.draw(screen)
         player_list.update()
         npc_spawn(rooms, screen)
+        jack.di(screen)
         if desert_eagle.shoot:
-            desert_eagle.update(pygame, screen, player)
+            desert_eagle.update(pygame, screen, player, desert_eagle.bullet_x)
     else:
         screen.fill(GREY)
         main_menu1.update(screen, 'Start', mouse_pos)

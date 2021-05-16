@@ -4,7 +4,6 @@ from module.settings import *
 def pull_out(message):
     message = message.strip('(').strip(')')
     message = message.split(', ')
-    message = tuple(map(lambda i: int(i)-1, message))
     return message
 
 def init():
@@ -37,14 +36,15 @@ def init():
             if i[0] == 'image':
                 image = pg.image.load(texture(i[1])).convert_alpha()
             elif original.startswith('    '):
-                del original
                 i[0] = int(i[0])
                 img = pull_out(i[1])
+                img = (int(img[0])-1, int(img[1])-1, int(img[2]), int(img[3]))
                 img = image.subsurface(img)
                 size = img.get_rect()
                 size = (size.width, size.height)
-                img = pg.transform.scale(img, (size[0]*4, size[1]*4))
+                img = pg.transform.scale(img, (int(size[0]*2.9), int(size[1]*2.85)))
                 player[name][i[0]] = img
+            del original
 
     fplayer.close()
     fblocks.close()

@@ -1,0 +1,1 @@
+GLOBAL_SPEED = 1

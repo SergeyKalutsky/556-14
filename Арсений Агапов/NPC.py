@@ -13,12 +13,31 @@ class NPC(pygame.sprite.Sprite):
         self.rect.y = y
         texts = ['Hi']
         self.text1 = self.font.render(texts[0], 1, (0, 0, 0))
+        self.act = False
+        self.text2 = self.font.render(
+                'ТЫ пока что ничего не можешь, но можешь пострелять на P', 1, (255, 255, 255))
+            
         
     def c(self, name, player, screen):
         if pygame.sprite.collide_rect(name, player):
+            text2 = self.font.render('Нажмите Y для диалога', 1, (0, 0, 0))
             self.text1 = self.font.render(
                 'Привет. Давай играть? но я ничего не умею', 1, (255, 255, 255))
             screen.blit(self.text1, (500, 900))
+            screen.blit(text2, (500, 800))
+            
+            
+    
+            
+    def di(self, screen):
+        if self.act:
+            pygame.draw.rect(screen, (0,0,0), (0, 900, 1920, 250))
+            screen.blit(self.text2, (200, 900))
+        
+        
+    
+        
+    
             
             
     

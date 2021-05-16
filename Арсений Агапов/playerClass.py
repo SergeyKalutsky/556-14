@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.move_speed = speed
         self.jumping = False
         self.jump_speed = 0
-
+        self.vector = 0
     def jump(self):
         if self.jumping:
             #self.rect.x += 10
@@ -32,7 +32,7 @@ class Player(pygame.sprite.Sprite):
         
     def speed(self):
         keys = pygame.key.get_pressed()
-        print(keys)
+        
         
     
         if keys[pygame.K_RIGHT]:
@@ -41,6 +41,7 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.image.load(img[self.counter])
             self.image = pygame.transform.scale(self.image, (300, 250))
             self.counter = (self.counter + 1) % len(img)
+            self.vector = 'Right'
 
         elif keys[pygame.K_LEFT]:
             if self.move_speed > -360:
@@ -48,7 +49,7 @@ class Player(pygame.sprite.Sprite):
             self.image = pygame.image.load(img[self.counter])
             self.image = pygame.transform.scale(self.image, (300, 250))
             self.counter = (self.counter + 1) % len(img)
-            
+            self.vector = 'Left'
         else:
             self.move_speed = 0
            
@@ -79,23 +80,29 @@ class Gun():
         self.y = y
         self.rad = 10
         self.bul = 0
-        self.bul_x = 0
-    def bullet_pos(self, player):
-        bullet_out = player.rect.x
-        return bullet_out 
+        self.bullet_x = 0
+        
+    def bullet_pos(self, bullet_p, vector):
+        if vector == 'Right':
+            
+            bullet_p += 10
+        elif vector == 'Left':
+            bullet_p -= 10
+        return bullet_p
+    
+    
         
             
-    def update(self, engine, screen, player):
-        self.x = player.rect.x
+    def update(self, engine, screen, player, bullet_x):
         
         
         
         if self.shoot:
-            self.bul_x += self.x
-            engine.draw.circle(screen, (51,51,51), (self.bul_x, self.y), self.rad)
-            self.bul_x += 10
+            self.bullet_x = self.bullet_pos(self.bullet_x, player.vector)
+            engine.draw.circle(screen, (51,51,51), (bullet_x + 100, self.y + 100), self.rad)
+            
         
-        if self.bul_x >= 1700:
+        if self.bullet_x >= 1700 or self.bullet_x < 0:
             self.shoot = False
             
                 

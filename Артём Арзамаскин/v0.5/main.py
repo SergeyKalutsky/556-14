@@ -8,7 +8,7 @@ class Main:
         pg.display.set_caption(WNAME)
         files.init()
         self.clock = pg.time.Clock()
-        self.player = objects.Player(0, 1000, self.screen, None, (1, 2))
+        self.player = objects.Player(0, 1206)
         self.chanks = []
         self.generate()
         self.mouse = objects.Mouse((255, 0, 0), (0, 0, 255), self.screen, self.player, self.chanks)
@@ -44,7 +44,7 @@ class Main:
         lst = []
         for coord in block_list:
             coord[1] = coord[1] * BSIZE
-            coord[2] = (coord[2]-8) * -BSIZE
+            coord[2] = (coord[2]-6) * -BSIZE
             block = blocks[coord[0]](*coord[1:], self.player)
             lst.append(block)
         chank = objects.Chank(lst)
@@ -106,9 +106,8 @@ class Main:
             # elif pr[2]:
             #     self.mouse.del_block()
 
-            self.draw()
             self.play()
-            pg.display.flip()
+            self.draw()
             self.clock.tick(FPS)
         pg.quit()
 
