@@ -1,87 +1,59 @@
-
 import pygame
-import game_object
+import game_objects
 from constants import *
-from game_menu import *
-
+from level import *
 class Game:
     def __init__(self):
+        # инициализируем библиотеку pygame
         pygame.init()
+        self.levels = Level()
+        # создаем графическое окно
+        WIN_WIDTH = self.levels.map_width
+        WIN_HEIGHT = self.levels.map_height
         self.screen = pygame.display.set_mode([WIN_WIDTH, WIN_HEIGHT])
-        pygame.display.set_caption('Test')
-        self.background_img = pygame.image.load("images/background.jpg").convert()
-        self.all_sprite_list = pygame.sprite.Group()
-        # Создаем платформы
-        self.platform_list = pygame.sprite.Group()
-        self.create_walls()
-        # Создаем артефакты
-        self.artifact_list = pygame.sprite.Group()
-        self.create_artifacts()
-        # Создаем спрайт игрока
-        self.player = game_object.Player(0, 0)
-        self.player.platforms = self.platform_list
-        self.player.artifacts = self.artifact_list
-        self.all_sprite_list.add(self.player)
-        self.enemy_list = pygame.sprite.Group()
-        self.create_enemies()
-        # Создаем меню
-        self.top_panel = TopPanel(20, 10)
-        self.main_menu = MainMenu(300, 200)
-
+        self.background_img = pygame.image.load("images/background.png").convert()
+        pygame.display.set_caption("Platformer")
+        self.level_num = 0
         self.clock = pygame.time.Clock()
+        # Задаем текущие состоятния игры ("START", "GAME", "PAUSE" или "FINISH")
+        self.state = "GAME"
 
-        # states: 'START', 'GAME', 'PAUSE', 'FINISH', 'GAME_OVER'
-        self.state = 'START'
-        self.time = 0
-    
-    def create_enemies(self):
-        # Создаем противников в игре
-        enemies_coords = [
-            [150, 350, 400],
-            [500, 550, 750],
-            [1250,550, 1400]
-        ]
-        for coord in enemies_coords:
-            enemy = game_object.Enemy(coord[0], coord[1])
-            enemy.stop = coord[2]
-            self.enemy_list.add(enemy)
-            self.all_sprite_list.add(enemy)
+    def create_level(self):
+        # создаем группу для всех спрайтов в игре
+        self.all_sprite_list = pygame.sprite.Group()
 
-    def create_walls(self):
+        # Создаем спрайт игрока
+        self.player = game_objects.Player()
+        self.all_sprite_list.add(self.player)
+
+        # связываем координаты с определениями объектов для текущего уровня
+        self.player.rect.x, self.player.rect.y = self.levels.load_level(self.level_num)
+
+        # создаем группу спрайтов - препятствий (платформ)
+        self.platform_list = pygame.sprite.Group()
+
         # Создаем стены и платформы
-        platform_coords = [
-            [0, 600],
-            [155, 345],
-            [320, 350],
-            [550, 245],
-            [735, 125],
-            [0, 300],
-            [0, 590],
-        ]
-        for coord in platform_coords:
-            platform = game_object.Platform(coord[0], coord[1])
+        for coord in self.levels.platform_coords:
+            platform = game_objects.Platform(coord[0], coord[1])
             self.platform_list.add(platform)
             self.all_sprite_list.add(platform)
+        self.artifact_list = pygame.sprite.Group()
 
-    def create_artifacts(self):
+        # Создаем артефакты
         # Создаем артефакты (монеты) в игре
-        artifact_coords = [
-            [170, 305],
-            [320, 310],
-            [370, 310],
-            [420, 310],
-            [565, 205],
-            [745, 85]
-        ]
-        for coord in artifact_coords:
-            artifact = game_object.Artifact(coord[0], coord[1])
+        for coord in self.levels.artifact_coords:
+            artifact = game_objects.Artifact(coord[0], coord[1])
             self.artifact_list.add(artifact)
             self.all_sprite_list.add(artifact)
 
-
+        # Задаем группу спрайтов - препятствий для игрока
+        self.player.platforms = self.platform_list
+        self.player.artifacts = self.artifact_list
 
     def handle_scene(self, event):
-        if self.state == 'GAME':
+        # обрабатываем сцену Идет Игра
+        if self.state == "GAME":
+            # обрабатываем нажатие клавиш - стрелок
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     self.player.go_left()
@@ -89,83 +61,52 @@ class Game:
                     self.player.go_right()
                 elif event.key == pygame.K_UP:
                     self.player.jump()
+                # переключение уровней на клавишу L
+                elif event.key == pygame.K_l:
+                    self.level_num = (self.level_num + 1) % len(self.levels.maps)
+                    self.create_level()
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and self.player.change_x < 0:
                     self.player.stop()
                 if event.key == pygame.K_RIGHT and self.player.change_x > 0:
                     self.player.stop()
-                elif event.key == pygame.K_ESCAPE:
-                    self.state = 'PAUSE'
 
-        # Если игра не идет, значит на экране главное меню
-        # Обрабатываем события главного меню:
-        else:
-            # Получаем кнопку, на которую нажали в главном меню:
-            active_button = self.main_menu.handle_mouse_event(event.type)
-            if active_button:
-                # После того, как на кнопку нажали, возвращаем ее состояние в "normal":
-                active_button.state =  'normal'
-
-                # Нажали на кнопку START, начинаем игру заново:
-                if active_button.name == 'START':
-                    self.__init__()
-                    self.state = 'GAME'
-
-                # На паузе и нажали CONTINUE, переведем игру с состояние GAME:
-                elif active_button.name == 'CONTINUE':
-                    self.state = 'GAME'
-
-                # Нажали на QUIT - завешим работу приложения:
-                elif active_button.name == 'QUIT':
-                    pygame.quit()
-
+        # обрабатываем сцену Игра Закончена
+        elif self.state == "FINISH":
+            pass
+        # Обрабатываем сцену Стартовый экран
+        elif self.state == "START" :
+            pass
 
     def draw_scene(self):
-        # Выполняем заливку фона:
-        self.screen.fill(BLACK)
-        self.screen.blit(self.background_img, [0, 0])
-        if self.state == 'START':
-            # Рисуем только главное меню:
-            self.main_menu.draw(self.screen)
-
-        elif self.state == 'GAME':
-            # Рисуем все спрайты в игре:
-            self.top_panel.draw(self.screen)
+        # Выполняем заливку экрана
+        self.screen.blit(self.background_img, (0, 0))
+        # Обрабатываем сцену Идет Игра
+        if self.state == "GAME":
             self.all_sprite_list.draw(self.screen)
-
-        elif self.state == 'PAUSE':
-            # Рисуем "обстановку" - платформы и главное меню:
-            self.top_panel.draw(self.screen)
-            self.platform_list.draw(self.screen)
-            self.main_menu.draw(self.screen)
-
-        elif self.state == 'FINISH':
-            # Рисуем только главное меню:
-            self.main_menu.draw(self.screen)
-
+        # Обрабатываем сцену Стартовый экран
+        elif self.state == "START": pass
+        # Обрабатываем сцену Пауза
+        elif self.state == "PAUSE": pass
+        # Обрабатываем сцену Игра Окончена
+        elif self.state == "FINISH": pass
+    
     def run(self):
         done = False
-        # Запустили главный игровой цикл:
+        # создаем текущий уровень
+        self.create_level()
         while not done:
             for event in pygame.event.get():
+                # Обрабатываем закрытие окна
                 if event.type == pygame.QUIT:
                     done = True
-                # Обрабатываем события для разных состояний:
+                # Обрабатываем события для разных состояний игры:
                 self.handle_scene(event)
-
-            # Если идет игра, обновляем все объекты в игре:
-            if self.state == 'GAME':
+            # Если идет игра, обновляем положение всех спрайтов в игре:
+            if self.state == "GAME":
                 self.all_sprite_list.update()
-                self.top_panel.update(coin=self.player.score)
-                # Проверяем, не досиг ли персонаж выхода:
-                if self.player.rect.x > WIN_WIDTH - 70 and self.player.rect.y > WIN_HEIGHT - 70:
-                    self.state = 'FINISH'
-
-            # Если игра на паузе или на старте, обновляем  меню:
-            else:
-                self.main_menu.update()
-            # Отрисовываем окно игры для текущего состояния:
+            # Прорисовываем экран в зависимости от состояния игры 
             self.draw_scene()
             pygame.display.flip()
             self.clock.tick(60)

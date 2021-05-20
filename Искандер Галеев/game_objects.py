@@ -7,7 +7,7 @@ from spritesheet_functions import SpriteSheet
  
 class Player(pygame.sprite.Sprite):
   
-    def __init__(self, x, y):
+    def __init__(self, x=0, y=0):
         super().__init__()
         # Задаем положение спрайта игрока на экране
         self.score = 0
